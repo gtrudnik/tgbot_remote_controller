@@ -17,4 +17,3 @@ def do_action(action):
 
 # 'volumedown', 'volumemute', 'volumeup', "playpause", 'prevtrack', 'nexttrack'
 # https://pyautogui.readthedocs.io/en/latest/keyboard.html
-pyautogui.press('prevtrack')
