@@ -1,5 +1,6 @@
 import keyboard
 import pyautogui
+import psutil
 import os
 
 
@@ -14,6 +15,9 @@ def click_key(btn):
 def do_action(action):
     pyautogui.press(action)
 
+
+def battery_info():
+    return psutil.sensors_battery()
 
 # 'volumedown', 'volumemute', 'volumeup', "playpause", 'prevtrack', 'nexttrack'
 # https://pyautogui.readthedocs.io/en/latest/keyboard.html

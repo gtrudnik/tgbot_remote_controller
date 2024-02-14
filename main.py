@@ -4,8 +4,10 @@ import const
 from rw_config import *
 from commands import *
 
+
 token = ''
 bot = telebot.TeleBot(token)
+active_users = []
 messages = dict()
 
 
@@ -22,28 +24,35 @@ def creat_markup():
     return markup
 
 
-def delete_messages(msg, msgs):
-    # delete user message
-    bot.delete_message(msg.chat.id, msg.message_id)
+def delete_messages(msg_id, msgs):
     # delete previous bot messages
-    if msg.chat.id in msgs.keys():
-        for msg in msgs[msg.chat.id]:
+    if msg_id in msgs.keys():
+        for msg in msgs[msg_id]:
             try:
                 bot.delete_message(msg.chat.id, msg.message_id)
-            except:
+            except Exception:
                 print("delete error")
-        msgs[msg.chat.id] = []
+        msgs[msg_id] = []
 
 
-@bot.message_handler(commands=['start', 'help'])
+@bot.message_handler(commands=['start'])
 def info_message(message):
-    bot_message = bot.send_message(message.chat.id, const.list_com + const.default_com + const.choose,
-                                   reply_markup=creat_markup())  # + get_commands().join("\n"))
-    delete_messages(message, messages)
-    if bot_message.chat.id in messages.keys():
-        messages[bot_message.chat.id].append(bot_message)
-    else:
-        messages[bot_message.chat.id] = [bot_message]
+    bot.delete_message(message.chat.id, message.message_id)
+    delete_messages(message.chat.id, messages)
+    if message.chat.id not in active_users:
+        bot.send_message(message.chat.id, const.list_com + const.default_com + const.choose,
+                                       reply_markup=creat_markup())  # + get_commands().join("\n"))
+        active_users.append(message.chat.id)
+
+
+@bot.message_handler(commands=['help'])
+def help_message(message):
+    bot.delete_message(message.chat.id, message.message_id)
+    delete_messages(message.chat.id, messages)
+    bot.send_message(message.chat.id, const.list_com + const.default_com + const.choose,
+                     reply_markup=creat_markup())
+    if message.chat.id not in active_users:
+        active_users.append(message.chat.id)
 
 
 @bot.message_handler(commands=['playpause'])
@@ -84,6 +93,16 @@ def volume_mute(message):
     info_message(message)
 
 
+@bot.message_handler(commands=['battery'])
+def battery_message(message):
+    x = battery_info()
+    bot_message = bot.send_message(message.chat.id, "Процент заряда: " + str(x[0]) + "%")
+    info_message(message)
+    if bot_message.chat.id in messages.keys():
+        messages[bot_message.chat.id].append(bot_message)
+    else:
+        messages[bot_message.chat.id] = [bot_message]
+
 @bot.message_handler(content_types=['text'])
 def analize_message(message):
     if message.text == "⏪️":
@@ -98,6 +117,8 @@ def analize_message(message):
         volume_down(message)
     elif message.text == "🔇":
         volume_mute(message)
+    else:
+        bot.delete_message(message.chat.id, message.message_id)
 
 
 bot.infinity_polling()
