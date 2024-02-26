@@ -16,10 +16,6 @@ def is_logged(chat_id):
     if len(chat) == 0:
         controller.add_chat(chat_id)
     chat = controller.get_chat(chat_id)[0]
-    if not chat.is_login:
-        bot_message = bot.send_message(chat_id, "Введите пароль!")  # + get_commands().join("\n"))
-        controller.add_message(bot_message.id, bot_message.text, chat_id)
-        print("Not login")
     return chat.is_login
 
 
@@ -36,6 +32,11 @@ def creat_markup():
     return markup
 
 
+def send_not_login_msg(chat_id):
+    bot_message = bot.send_message(chat_id, "Введите пароль!")
+    controller.add_message(bot_message.id, bot_message.text, chat_id)
+
+
 def delete_messages(msgs):
     # delete previous bot messages
     for msg in msgs:
@@ -50,11 +51,10 @@ def delete_messages(msgs):
 def info_message(message):
     bot.delete_message(message.chat.id, message.message_id)
     if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
         return 0
     messages = controller.get_not_menu_msgs_chat(message.chat.id)
-    print(messages)
     delete_messages(messages)
-    print(controller.is_exist_menu_message(message.chat.id))
     if not controller.is_exist_menu_message(message.chat.id):
         bot_message = bot.send_message(message.chat.id, const.list_com + const.default_com + const.choose,
                                        reply_markup=creat_markup())  # + get_commands().join("\n"))
@@ -64,6 +64,9 @@ def info_message(message):
 @bot.message_handler(commands=['help'])
 def help_message(message):
     bot.delete_message(message.chat.id, message.message_id)
+    if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
+        return 0
     messages = controller.get_all_msgs_chat(message.chat.id)
     delete_messages(messages)
     controller.delete_all_msg_chat(message.chat.id)
@@ -75,6 +78,7 @@ def help_message(message):
 @bot.message_handler(commands=['playpause'])
 def play_pause(message):
     if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
         return 0
     do_action("playpause")
     info_message(message)
@@ -83,6 +87,7 @@ def play_pause(message):
 @bot.message_handler(commands=['next'])
 def play_next(message):
     if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
         return 0
     do_action("nexttrack")
     info_message(message)
@@ -91,6 +96,7 @@ def play_next(message):
 @bot.message_handler(commands=['previous'])
 def play_previous(message):
     if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
         return 0
     do_action("prevtrack")
     info_message(message)
@@ -99,6 +105,7 @@ def play_previous(message):
 @bot.message_handler(commands=['volumeup'])
 def volume_up(message):
     if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
         return 0
     for i in range(5):
         do_action("volumeup")
@@ -108,6 +115,7 @@ def volume_up(message):
 @bot.message_handler(commands=['volumedown'])
 def volume_down(message):
     if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
         return 0
     for i in range(5):
         do_action("volumedown")
@@ -117,6 +125,7 @@ def volume_down(message):
 @bot.message_handler(commands=['volumemute'])
 def volume_mute(message):
     if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
         return 0
     do_action("volumemute")
     info_message(message)
@@ -125,6 +134,7 @@ def volume_mute(message):
 @bot.message_handler(commands=['battery'])
 def battery_message(message):
     if not is_logged(message.chat.id):
+        send_not_login_msg(message.chat.id)
         return 0
     x = battery_info()
     bot_message = bot.send_message(message.chat.id, "Процент заряда: " + str(x[0]) + "%")
@@ -137,6 +147,12 @@ def analyze_message(message):
     if not is_logged(message.chat.id):
         if message.text == password:
             controller.login_chat(message.chat.id)
+            bot_message = bot.send_message(message.chat.id, "Вы успешно вошли!")
+            info_message(message)
+        else:
+            bot_message = bot.send_message(message.chat.id, "Пароль неверный!")
+            bot.delete_message(message.chat.id, message.message_id)
+        controller.add_message(bot_message.id, bot_message.text, message.chat.id)
     elif message.text == "⏪️":
         play_previous(message)
     elif message.text == "⏯️":

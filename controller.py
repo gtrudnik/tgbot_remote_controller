@@ -54,15 +54,7 @@ class Controller:
         self.session.commit()
 
     def is_exist_menu_message(self, chat_id):
-        print(chat_id)
         messages = self.session.query(Message).where(Message.chat_id == chat_id).all()
-        print(messages)
         return len(messages) > 0
 
 
-contr = Controller()
-# contr.add_chat(4)
-# contr.add_message(9, "fgfdg", 4)
-# contr.add_message(61, "ttt", 4)
-# contr.add_message(72, "g", 4)
-#print(contr.get_chat(7))
