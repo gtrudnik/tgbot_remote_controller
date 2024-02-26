@@ -10,7 +10,7 @@ Base = declarative_base()
 
 class Chat(Base):
     __tablename__ = 'chats'
-    chat_id = Column(
+    id = Column(
         Integer,
         nullable=False,
         unique=True,
@@ -19,12 +19,12 @@ class Chat(Base):
     is_login = Column(Boolean)
 
     def __repr__(self):
-        return f'{self.chat_id} - {self.is_login}'
+        return f'{self.id} - {self.is_login}'
 
 
 class Message(Base):
     __tablename__ = 'messages'
-    message_id = Column(
+    id = Column(
         Integer,
         nullable=False,
         unique=True,
@@ -32,10 +32,11 @@ class Message(Base):
     )
     created_at = Column(DateTime)
     text_message = Column(Text)
-    chat_id = Column(Integer, ForeignKey('chats.chat_id'))
+    is_menu = Column(Boolean)
+    chat_id = Column(Integer, ForeignKey('chats.id'))
 
     def __repr__(self):
-        return f'{self.message_id} {self.created_at} {self.chat_id}'
+        return f'{self.id} {self.created_at} {self.chat_id}'
 
 
 Base.metadata.create_all(bind=engine)
