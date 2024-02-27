@@ -5,9 +5,8 @@ from rw_config import *
 from commands import *
 from controller import Controller
 
-token = ''
+token, password = read_config()
 bot = telebot.TeleBot(token)
-password = '12345678'
 controller = Controller()
 
 
