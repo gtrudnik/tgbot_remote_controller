@@ -5,19 +5,18 @@ def read_config():
         token = lines[0].split("=")[-1].strip()
         password = lines[1].split("=")[-1].strip()
     except Exception:
-        create_config()
+        print("Created config.txt, you should edit it.")
+        create_config("token_bot", "password")
         token, password = read_config()
     return token, password
 
 
-def create_config():
+def create_config(token_bot: str, password: str):
     with open("config.txt", "w") as f:
-        f.write("token=my_token\n")
-        f.write("password=12345678\n")
+        f.write(f"token={token_bot}\n")
+        f.write(f"password={password}\n")
 
 
 def add_commands():
     pass
 
-
-print(read_config())

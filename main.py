@@ -18,7 +18,7 @@ def is_logged(chat_id):
     return chat.is_login
 
 
-def creat_markup():
+def create_markup():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     item1 = types.KeyboardButton("⏪️")
     item2 = types.KeyboardButton("⏯️")
@@ -56,7 +56,7 @@ def info_message(message):
     delete_messages(messages)
     if not controller.is_exist_menu_message(message.chat.id):
         bot_message = bot.send_message(message.chat.id, const.list_com + const.default_com + const.choose,
-                                       reply_markup=creat_markup())  # + get_commands().join("\n"))
+                                       reply_markup=create_markup())  # + get_commands().join("\n"))
         controller.add_message(bot_message.id, bot_message.text, message.chat.id, is_menu=True)
 
 
@@ -70,7 +70,7 @@ def help_message(message):
     delete_messages(messages)
     controller.delete_all_msg_chat(message.chat.id)
     bot_message = bot.send_message(message.chat.id, const.list_com + const.default_com + const.choose,
-                                   reply_markup=creat_markup())
+                                   reply_markup=create_markup())
     controller.add_message(bot_message.id, bot_message.text, message.chat.id, is_menu=True)
 
 
